@@ -1,3 +1,3 @@
 # This file will be read by resetprop
-# Example: Change dpi
+# Example: Change DPI
 # ro.sf.lcd_density=320

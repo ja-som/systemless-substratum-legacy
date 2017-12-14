@@ -1,6 +1,10 @@
-# Magisk Module Template
+# Unofficial Magisk Module Template
 
 For more information about modules and repos, please check the [official documentations](https://github.com/topjohnwu/Magisk/blob/master/docs/module_repo.md)
+
+Note: They don't point to my repositories (instead, they point to the topjohnwu's ones)
+
+Caution: Please don't upload modules to the Magisk module repo using this template (until Magisk v15.0 gets released to the stable channel)
 
 ### README.md
 

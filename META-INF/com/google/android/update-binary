@@ -1,8 +1,8 @@
 #!/sbin/sh
 ##########################################################################################
 #
-# Magisk Module Template Install Script
-# by topjohnwu
+# Unofficial Magisk Module Template Install Script
+# by topjohnwu, TheComputerGuy96
 #
 ##########################################################################################
 
@@ -10,7 +10,7 @@
 ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
 $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
 
-# This path should work in any cases
+# This path should work in any case
 TMPDIR=/dev/tmp
 MOUNTPATH=$TMPDIR/magisk_img
 $BOOTMODE && IMG=/data/magisk_merge.img || IMG=/data/magisk.img
@@ -36,8 +36,8 @@ ui_print() { echo "$1"; }
 
 require_new_magisk() {
   ui_print "***********************************"
-  ui_print "! $MAGISKBIN isn't setup properly!"
-  ui_print "! Please install Magisk v14.0+!"
+  ui_print "! $MAGISKBIN isn't set up properly!"
+  ui_print "! Please install Magisk v14.5+!"
   ui_print "***********************************"
   exit 1
 }
@@ -46,23 +46,23 @@ mount /data 2>/dev/null
 
 # Utility functions must exist
 [ -f $MAGISKBIN/util_functions.sh ] || require_new_magisk
-# Load utility fuctions
+# Load utility functions
 . $MAGISKBIN/util_functions.sh
 
 get_outfd
 
 mount_partitions
 
-$BOOTMODE && ! is_mounted /magisk && abort "! Magisk is not activated!"
-[ ! -f /system/build.prop ] && abort "! /system could not be mounted!"
+$BOOTMODE && ! is_mounted /sbin/.core/img && abort "! Magisk isn't activated!"
+[ ! -f /system/build.prop ] && abort "! /system couldn't be mounted!"
 
 # Detect version and architecture
 api_level_arch_detect
 
 # You can get the Android API version from $API, the CPU architecture from $ARCH
-# Useful if you are creating Android version / platform dependent mods
+# Useful if you're creating Android version / platform-dependent mods
 
-# We need busybox/binaries to be setup
+# We need busybox/binaries to be set up
 $BOOTMODE && boot_actions || recovery_actions
 
 ##########################################################################################
@@ -76,16 +76,16 @@ unzip -o "$ZIP" module.prop config.sh 'common/*' -d $INSTALLER 2>/dev/null
 # Load configurations
 . $INSTALLER/config.sh
 
-# Check the min magisk version
+# Check the minimum Magisk version
 MIN_VER=`grep_prop template $INSTALLER/module.prop`
 [ ! -z $MAGISK_VER_CODE -a $MAGISK_VER_CODE -ge $MIN_VER ] || require_new_magisk
 MODID=`grep_prop id $INSTALLER/module.prop`
 MODPATH=$MOUNTPATH/$MODID
 
-# Print mod name
+# Print module name
 print_modname
 
-# Please leave this message in your flashable zip for credits :)
+# Please leave this message in your flashable ZIP for credits :)
 ui_print "******************************"
 ui_print "Powered by Magisk (@topjohnwu)"
 ui_print "******************************"
@@ -120,7 +120,7 @@ mkdir -p $MODPATH
 
 ui_print "- Extracting module files"
 unzip -o "$ZIP" 'system/*' -d $MODPATH 2>/dev/null
-# Remove placeholder (people always forgot to remove it...)
+# Remove placeholder (people always forget to remove it...)
 rm -f $MODPATH/system/placeholder 2>/dev/null
 
 # Handle replace folders
@@ -131,7 +131,7 @@ done
 # Auto Mount
 $AUTOMOUNT && touch $MODPATH/auto_mount
 
-# prop files
+# .prop files
 $PROPFILE && cp -af $INSTALLER/common/system.prop $MODPATH/system.prop
 
 # Module info
@@ -145,7 +145,7 @@ fi
 # post-fs-data mode scripts
 $POSTFSDATA && cp -af $INSTALLER/common/post-fs-data.sh $MODPATH/post-fs-data.sh
 
-# service mode scripts
+# late_start service mode scripts
 $LATESTARTSERVICE && cp -af $INSTALLER/common/service.sh $MODPATH/service.sh
 
 ui_print "- Setting permissions"
