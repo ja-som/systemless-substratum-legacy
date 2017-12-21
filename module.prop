@@ -4,4 +4,5 @@ version=v1
 versionCode=1
 author=TheComputerGuy96
 description=A short description
-minMagisk=1456
+template=1400
+minMagisk=1400

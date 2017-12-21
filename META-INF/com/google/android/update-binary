@@ -37,7 +37,7 @@ ui_print() { echo "$1"; }
 require_new_magisk() {
   ui_print "***********************************"
   ui_print "! $MAGISKBIN isn't set up properly!"
-  ui_print "! Please install Magisk v14.5+!"
+  ui_print "! Please install Magisk v14.0+!"
   ui_print "***********************************"
   exit 1
 }
@@ -51,9 +51,20 @@ mount /data 2>/dev/null
 
 get_outfd
 
-mount_partitions
+[ ! -z $MAGISK_VER_CODE -a $MAGISK_VER_CODE -ge 1410 ] && PIXMAGISK=true || PIXMAGISK=false
+[ ! -z $MAGISK_VER_CODE -a $MAGISK_VER_CODE -ge 1450 ] && SBINCORE=true || SBINCORE=false
+$SBINCORE && BOOTMODEPATH=/sbin/core/.img || BOOTMODEPATH=/magisk
 
-$BOOTMODE && ! is_mounted /sbin/.core/img && abort "! Magisk isn't activated!"
+if $PIXMAGISK; then
+  mount_partitions
+else
+  ui_print "- Mounting /system, /vendor and /cache"
+  mount -o ro /system 2>/dev/null
+  mount -o ro /vendor 2>/dev/null
+  mount /cache 2>/dev/null
+fi
+
+$BOOTMODE && ! is_mounted $BOOTMODEPATH && abort "! Magisk isn't activated!"
 [ ! -f /system/build.prop ] && abort "! /system couldn't be mounted!"
 
 # Detect version and architecture
@@ -72,12 +83,12 @@ $BOOTMODE && boot_actions || recovery_actions
 # Extract common files
 unzip -o "$ZIP" module.prop config.sh 'common/*' -d $INSTALLER 2>/dev/null
 
-[ ! -f $INSTALLER/config.sh ] && abort "! Unable to extract zip file!"
+[ ! -f $INSTALLER/config.sh ] && abort "! Unable to extract the ZIP file!"
 # Load configurations
 . $INSTALLER/config.sh
 
 # Check the minimum Magisk version
-MIN_VER=`grep_prop template $INSTALLER/module.prop`
+MIN_VER=`grep_prop minMagisk $INSTALLER/module.prop`
 [ ! -z $MAGISK_VER_CODE -a $MAGISK_VER_CODE -ge $MIN_VER ] || require_new_magisk
 MODID=`grep_prop id $INSTALLER/module.prop`
 MODPATH=$MOUNTPATH/$MODID
@@ -106,7 +117,7 @@ if [ -f "$IMG" ]; then
   fi
 else
   newSizeM=$((reqSizeM / 32 * 32 + 64));
-  ui_print "- Creating $IMG with size ${newSizeM}M"
+  ui_print "- Creating $IMG with a size of ${newSizeM}M"
   $MAGISKBIN/magisk --createimg $IMG $newSizeM
 fi
 
@@ -118,7 +129,7 @@ is_mounted $MOUNTPATH || abort "! $IMG mount failed..."
 rm -rf $MODPATH 2>/dev/null
 mkdir -p $MODPATH
 
-ui_print "- Extracting module files"
+ui_print "- Extracting module's files"
 unzip -o "$ZIP" 'system/*' -d $MODPATH 2>/dev/null
 # Remove placeholder (people always forget to remove it...)
 rm -f $MODPATH/system/placeholder 2>/dev/null
