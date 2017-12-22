@@ -53,7 +53,7 @@ get_outfd
 
 [ ! -z $MAGISK_VER_CODE -a $MAGISK_VER_CODE -ge 1410 ] && PIXMAGISK=true || PIXMAGISK=false
 [ ! -z $MAGISK_VER_CODE -a $MAGISK_VER_CODE -ge 1450 ] && SBINCORE=true || SBINCORE=false
-$SBINCORE && BOOTMODEPATH=/sbin/core/.img || BOOTMODEPATH=/magisk
+$SBINCORE && BOOTMODEPATH=/sbin/.core/img || BOOTMODEPATH=/magisk
 
 if $PIXMAGISK; then
   mount_partitions
