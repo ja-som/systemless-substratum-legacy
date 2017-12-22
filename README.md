@@ -1,13 +1,16 @@
-# Unofficial Magisk Module Template
+# Systemless Substratum (Legacy/Layers mode)
+ A Magisk module which allows installation of Substratum themes in legacy/root mode
+systemlessly.
 
-For more information about modules and repos, please check the [official documentations](https://github.com/topjohnwu/Magisk/blob/master/docs/module_repo.md)
+ The new Substratum OMS mode works systemlessly but requires support for it in the ROM.
+For the rest, the Legacy mode, which requires root access, normally writes in the
+system partition.
+ This module aims to provide this functionality via Magisk in a systemless way.
 
-Note: They don't point to my repositories (instead, they point to the topjohnwu's ones)
+## Changelog
 
-### README.md
+ v3:
+ - Update to unofficial 1456 (Magisk v14.0+) template
+ - Initial release on the Magisk module repo
 
-This `README.md` can be shown in Magisk Manager. Place any information/changelog/notes you like.
-
-**Please update `README.md` if you want to submit your module to the online repo!**
-
-You can edit your `README.md` within GitHub's online editor, it also has an preview button! Check the [Markdown Cheat Sheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) for Markdown syntax, it's super easy!
+[Donation link (Nodens-)](https://paypal.me/NodensDev)
