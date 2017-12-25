@@ -4,5 +4,6 @@ version=v1
 versionCode=1
 author=TheComputerGuy96
 description=A short description
+# For older Magisk Manager versions
 template=1400
 minMagisk=1400
