@@ -13,9 +13,7 @@ $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMO
 # This path should work in any case
 TMPDIR=/dev/tmp
 MOUNTPATH=$TMPDIR/magisk_img
-$BOOTMODE && IMG=/data/magisk_merge.img || IMG=/data/magisk.img
 INSTALLER=$TMPDIR/install
-MAGISKBIN=/data/magisk
 
 # Default permissions
 umask 022
@@ -44,6 +42,9 @@ require_new_magisk() {
 
 mount /data 2>/dev/null
 
+# Use the new Magisk binary path in Magisk v14.6+ (beta) (needed to improve reliability)
+[ -d /data/adb/magisk ] && MAGISKBIN=/data/adb/magisk || MAGISKBIN=/data/magisk
+
 # Utility functions must exist
 [ -f $MAGISKBIN/util_functions.sh ] || require_new_magisk
 # Load utility functions
@@ -51,19 +52,24 @@ mount /data 2>/dev/null
 
 get_outfd
 
-[ ! -z $MAGISK_VER_CODE -a $MAGISK_VER_CODE -ge 1410 ] && PIXMAGISK=true || PIXMAGISK=false
-[ ! -z $MAGISK_VER_CODE -a $MAGISK_VER_CODE -ge 1450 ] && SBINCORE=true || SBINCORE=false
-$SBINCORE && BOOTMODEPATH=/sbin/.core/img || BOOTMODEPATH=/magisk
+# Image-related stuff (for forwards and backwards compatibility)
+$BOOTMODE && [ -d /data/adb/magisk ] && IMG=/data/adb/magisk_merge.img || IMG=/data/magisk_merge.img
+$BOOTMODE || [ -d /data/adb/magisk ] && IMG=/data/adb/magisk.img || IMG=/data/magisk.img
 
-if $PIXMAGISK; then
+$BOOTMODE && [ -d /sbin/.core/img ] && BOOTMODEPATH=/sbin/.core/img || BOOTMODEPATH=/magisk
+
+# Magisk A/B support check
+if type mount_partitions >/dev/null; then
   mount_partitions
 else
+  # Mount partitions with some commands on Magisk v14.0
   ui_print "- Mounting /system, /vendor and /cache"
   mount -o ro /system 2>/dev/null
   mount -o ro /vendor 2>/dev/null
   mount /cache 2>/dev/null
 fi
 
+# Store boot mode-only magisk.img mount path in a variable (look above for the check)
 $BOOTMODE && ! is_mounted $BOOTMODEPATH && abort "! Magisk isn't activated!"
 [ ! -f /system/build.prop ] && abort "! /system couldn't be mounted!"
 
@@ -87,7 +93,7 @@ unzip -o "$ZIP" module.prop config.sh 'common/*' -d $INSTALLER 2>/dev/null
 # Load configurations
 . $INSTALLER/config.sh
 
-# Check the minimum Magisk version
+# Check the minimum Magisk version (MIN_VER variable updated for consistency)
 MIN_VER=`grep_prop minMagisk $INSTALLER/module.prop`
 [ ! -z $MAGISK_VER_CODE -a $MAGISK_VER_CODE -ge $MIN_VER ] || require_new_magisk
 MODID=`grep_prop id $INSTALLER/module.prop`

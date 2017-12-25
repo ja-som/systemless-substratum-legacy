@@ -4,5 +4,6 @@ version=v3
 versionCode=3
 author=Nodens-, TheComputerGuy96
 description=A Magisk module which allows installation of Substratum themes in legacy/root mode systemlessly.
+# For older Magisk Manager versions
 template=1400
 minMagisk=1400
