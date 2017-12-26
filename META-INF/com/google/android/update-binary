@@ -1,8 +1,8 @@
 #!/sbin/sh
 ##########################################################################################
 #
-# Unofficial Magisk Module Template Install Script
-# by topjohnwu, TheComputerGuy96
+# Magisk Module Template Install Script
+# by topjohnwu
 #
 ##########################################################################################
 
@@ -10,7 +10,7 @@
 ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
 $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
 
-# This path should work in any case
+# This path should work in any cases
 TMPDIR=/dev/tmp
 MOUNTPATH=$TMPDIR/magisk_img
 $BOOTMODE && IMG=/data/magisk_merge.img || IMG=/data/magisk.img
@@ -36,7 +36,7 @@ ui_print() { echo "$1"; }
 
 require_new_magisk() {
   ui_print "***********************************"
-  ui_print "! $MAGISKBIN isn't set up properly!"
+  ui_print "! $MAGISKBIN isn't setup properly!"
   ui_print "! Please install Magisk v14.0+!"
   ui_print "***********************************"
   exit 1
@@ -46,34 +46,23 @@ mount /data 2>/dev/null
 
 # Utility functions must exist
 [ -f $MAGISKBIN/util_functions.sh ] || require_new_magisk
-# Load utility functions
+# Load utility fuctions
 . $MAGISKBIN/util_functions.sh
 
 get_outfd
 
-[ ! -z $MAGISK_VER_CODE -a $MAGISK_VER_CODE -ge 1410 ] && PIXMAGISK=true || PIXMAGISK=false
-[ ! -z $MAGISK_VER_CODE -a $MAGISK_VER_CODE -ge 1450 ] && SBINCORE=true || SBINCORE=false
-$SBINCORE && BOOTMODEPATH=/sbin/.core/img || BOOTMODEPATH=/magisk
+mount_partitions
 
-if $PIXMAGISK; then
-  mount_partitions
-else
-  ui_print "- Mounting /system, /vendor and /cache"
-  mount -o ro /system 2>/dev/null
-  mount -o ro /vendor 2>/dev/null
-  mount /cache 2>/dev/null
-fi
-
-$BOOTMODE && ! is_mounted $BOOTMODEPATH && abort "! Magisk isn't activated!"
-[ ! -f /system/build.prop ] && abort "! /system couldn't be mounted!"
+$BOOTMODE && ! is_mounted /magisk && abort "! Magisk is not activated!"
+[ ! -f /system/build.prop ] && abort "! /system could not be mounted!"
 
 # Detect version and architecture
 api_level_arch_detect
 
 # You can get the Android API version from $API, the CPU architecture from $ARCH
-# Useful if you're creating Android version / platform-dependent mods
+# Useful if you are creating Android version / platform dependent mods
 
-# We need busybox/binaries to be set up
+# We need busybox/binaries to be setup
 $BOOTMODE && boot_actions || recovery_actions
 
 ##########################################################################################
@@ -83,20 +72,20 @@ $BOOTMODE && boot_actions || recovery_actions
 # Extract common files
 unzip -o "$ZIP" module.prop config.sh 'common/*' -d $INSTALLER 2>/dev/null
 
-[ ! -f $INSTALLER/config.sh ] && abort "! Unable to extract the ZIP file!"
+[ ! -f $INSTALLER/config.sh ] && abort "! Unable to extract zip file!"
 # Load configurations
 . $INSTALLER/config.sh
 
-# Check the minimum Magisk version
-MIN_VER=`grep_prop minMagisk $INSTALLER/module.prop`
+# Check the min magisk version
+MIN_VER=`grep_prop template $INSTALLER/module.prop`
 [ ! -z $MAGISK_VER_CODE -a $MAGISK_VER_CODE -ge $MIN_VER ] || require_new_magisk
 MODID=`grep_prop id $INSTALLER/module.prop`
 MODPATH=$MOUNTPATH/$MODID
 
-# Print module name
+# Print mod name
 print_modname
 
-# Please leave this message in your flashable ZIP for credits :)
+# Please leave this message in your flashable zip for credits :)
 ui_print "******************************"
 ui_print "Powered by Magisk (@topjohnwu)"
 ui_print "******************************"
@@ -117,7 +106,7 @@ if [ -f "$IMG" ]; then
   fi
 else
   newSizeM=$((reqSizeM / 32 * 32 + 64));
-  ui_print "- Creating $IMG with a size of ${newSizeM}M"
+  ui_print "- Creating $IMG with size ${newSizeM}M"
   $MAGISKBIN/magisk --createimg $IMG $newSizeM
 fi
 
@@ -129,9 +118,9 @@ is_mounted $MOUNTPATH || abort "! $IMG mount failed..."
 rm -rf $MODPATH 2>/dev/null
 mkdir -p $MODPATH
 
-ui_print "- Extracting module's files"
+ui_print "- Extracting module files"
 unzip -o "$ZIP" 'system/*' -d $MODPATH 2>/dev/null
-# Remove placeholder (people always forget to remove it...)
+# Remove placeholder (people always forgot to remove it...)
 rm -f $MODPATH/system/placeholder 2>/dev/null
 
 # Handle replace folders
@@ -142,7 +131,7 @@ done
 # Auto Mount
 $AUTOMOUNT && touch $MODPATH/auto_mount
 
-# .prop files
+# prop files
 $PROPFILE && cp -af $INSTALLER/common/system.prop $MODPATH/system.prop
 
 # Module info
@@ -156,7 +145,7 @@ fi
 # post-fs-data mode scripts
 $POSTFSDATA && cp -af $INSTALLER/common/post-fs-data.sh $MODPATH/post-fs-data.sh
 
-# late_start service mode scripts
+# service mode scripts
 $LATESTARTSERVICE && cp -af $INSTALLER/common/service.sh $MODPATH/service.sh
 
 ui_print "- Setting permissions"
