@@ -53,7 +53,7 @@ mount /data 2>/dev/null
 get_outfd
 
 # Image-related stuff (for forwards and backwards compatibility)
-$BOOTMODE && [ -d /data/adb/magisk ] && IMG=/data/adb/magisk_merge.img || IMG=/data/magisk_merge.img
+$BOOTMODE && IMG=/data/magisk_merge.img
 $BOOTMODE || [ -d /data/adb/magisk ] && IMG=/data/adb/magisk.img || IMG=/data/magisk.img
 
 $BOOTMODE && [ -d /sbin/.core/img ] && BOOTMODEPATH=/sbin/.core/img || BOOTMODEPATH=/magisk
@@ -155,8 +155,8 @@ $PROPFILE && cp -af $INSTALLER/common/system.prop $MODPATH/system.prop
 cp -af $INSTALLER/module.prop $MODPATH/module.prop
 if $BOOTMODE; then
   # Update info for Magisk Manager
-  mktouch /magisk/$MODID/update
-  cp -af $INSTALLER/module.prop /magisk/$MODID/module.prop
+  mktouch $BOOTMODEPATH/$MODID/update
+  cp -af $INSTALLER/module.prop $BOOTMODEPATH/$MODID/module.prop
 fi
 
 # post-fs-data mode scripts
