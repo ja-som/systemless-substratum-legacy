@@ -25,6 +25,10 @@
 # Most mods would like it to be enabled
 AUTOMOUNT=true
 
+# Set to true if you want to enable autouninstall functionality
+# Note: It only works if no module update is detected
+AUTOUNINSTALL=false
+
 # Set to true if you need to load system.prop
 PROPFILE=false
 

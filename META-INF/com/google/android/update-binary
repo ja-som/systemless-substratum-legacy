@@ -131,42 +131,77 @@ ui_print "- Mounting $IMG to $MOUNTPATH"
 MAGISKLOOP=`$MAGISKBIN/magisk --mountimg $IMG $MOUNTPATH`
 is_mounted $MOUNTPATH || abort "! $IMG mount failed..."
 
-# Create mod paths
-rm -rf $MODPATH 2>/dev/null
-mkdir -p $MODPATH
+# Wrap the image mount path
+$BOOTMODE && MODPATH2=$BOOTMODEPATH/$MODID || MODPATH2=$MODPATH
 
-ui_print "- Extracting module's files"
-unzip -o "$ZIP" 'system/*' -d $MODPATH 2>/dev/null
-# Remove placeholder (people always forget to remove it...)
-rm -f $MODPATH/system/placeholder 2>/dev/null
+if $AUTOUNINSTALL; then
+  # Compare the versionCode of both copies of the module
+  OLDVER=`grep_prop versionCode $MODPATH2/module.prop`
+  NEWVER=`grep_prop versionCode $INSTALLER/module.prop`
 
-# Handle replace folders
-for TARGET in $REPLACE; do
-  mktouch $MODPATH$TARGET/.replace
-done
-
-# Auto Mount
-$AUTOMOUNT && touch $MODPATH/auto_mount
-
-# .prop files
-$PROPFILE && cp -af $INSTALLER/common/system.prop $MODPATH/system.prop
-
-# Module info
-cp -af $INSTALLER/module.prop $MODPATH/module.prop
-if $BOOTMODE; then
-  # Update info for Magisk Manager
-  mktouch $BOOTMODEPATH/$MODID/update
-  cp -af $INSTALLER/module.prop $BOOTMODEPATH/$MODID/module.prop
+  if [ ! -z $OLDVER ]; then
+    if [ $OLDVER -eq $NEWVER ]; then
+      INSTALL=false
+    else
+      INSTALL=true
+    fi
+  elif [ -z $OLDVER ]; then
+    INSTALL=true
+  fi
+elif ! $AUTOUNINSTALL; then
+  INSTALL=true
 fi
 
-# post-fs-data mode scripts
-$POSTFSDATA && cp -af $INSTALLER/common/post-fs-data.sh $MODPATH/post-fs-data.sh
+if $INSTALL; then
+  # Create mod paths
+  rm -rf $MODPATH 2>/dev/null
+  mkdir -p $MODPATH
 
-# late_start service mode scripts
-$LATESTARTSERVICE && cp -af $INSTALLER/common/service.sh $MODPATH/service.sh
+  # Extract files to system. Use your own method if needed
+  ui_print "- Extracting module's files"
+  unzip -o "$ZIP" 'system/*' -d $MODPATH >&2
 
-ui_print "- Setting permissions"
-set_permissions
+  # Remove placeholder
+  rm -f $MODPATH/system/placeholder 2>/dev/null
+
+  # Handle replace folders
+  for TARGET in $REPLACE; do
+    mktouch $MODPATH$TARGET/.replace
+  done
+
+  # Auto Mount
+  $AUTOMOUNT && touch $MODPATH/auto_mount
+
+  # .prop files
+  $PROPFILE && cp -af $INSTALLER/common/system.prop $MODPATH/system.prop
+
+  # Module info
+  cp -af $INSTALLER/module.prop $MODPATH/module.prop
+  if $BOOTMODE; then
+    # Update info for Magisk Manager
+    mktouch $MODPATH2/update
+    cp -af $INSTALLER/module.prop $MODPATH2/module.prop
+  fi
+
+  # post-fs-data mode scripts
+  $POSTFSDATA && cp -af $INSTALLER/common/post-fs-data.sh $MODPATH/post-fs-data.sh
+
+  # late_start service mode scripts
+  $LATESTARTSERVICE && cp -af $INSTALLER/common/service.sh $MODPATH/service.sh
+
+  ui_print "- Setting permissions"
+  set_permissions
+elif ! $INSTALL; then
+  # Uninstall the module
+  ui_print "- No module update detected"
+  ui_print "- Uninstalling the module"
+
+  if ! $BOOTMODE; then
+    rm -rf $MODPATH2 2>/dev/null
+  elif $BOOTMODE; then
+    touch $MODPATH2/remove 2>/dev/null
+  fi
+fi
 
 ##########################################################################################
 # Finalizing
