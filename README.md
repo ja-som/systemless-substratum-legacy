@@ -15,7 +15,8 @@ To uninstall this module, just reflash this module's ZIP (preferably in recovery
 
 v4.1:
  - Update to official 1500 template
- [Download]()
+
+[Download](https://github.com/Magisk-Modules-Repo/systemless-substratum-legacy/releases/download/v4.1/systemless-substratum-legacy_v4.1.zip)
 
  v4:
  - Update to unofficial 1468 (Magisk v14.0+) template
@@ -26,12 +27,14 @@ v4.1:
  - Update README
  - Add GPL v3 license
  - Add .gitignore file for convenience
- [Download]()
+
+[Download](https://github.com/Magisk-Modules-Repo/systemless-substratum-legacy/releases/download/v4/systemless-substratum-legacy_v4.zip)
 
  v3:
  - Update to unofficial 1456 (Magisk v14.0+) template
  - Initial release on the Magisk module repo
- No download available
+
+No download available
 
 [Nodens' XDA thread (old)](https://forum.xda-developers.com/apps/magisk/module-systemless-substratum-legacy-t3623607)
 
