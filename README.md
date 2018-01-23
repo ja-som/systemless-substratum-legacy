@@ -9,6 +9,7 @@ system partition.
 
 ## Important Note
 
+To uninstall this module, just reflash this module's ZIP (preferably in recovery mode). This will remove both the module and everything Substratum saves in /data when you apply themes. DO NOT use the Rescue ZIPs Substratum saves in /sdcard. Do this instead if something goes wrong or you want to wipe ALL Substratum overlays. You will have to reinstall the module afterwards.
 
 ## Changelog
 
