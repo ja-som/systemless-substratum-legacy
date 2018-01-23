@@ -26,7 +26,7 @@ AUTOMOUNT=true
 
 # Set to true if you want to enable autouninstall functionality
 # Note: It only works if no module update is detected
-AUTOUNINSTALL=false
+AUTOUNINSTALL=true
 
 # Set to true if you need to load system.prop
 PROPFILE=false
@@ -67,7 +67,6 @@ REPLACE="
 # Construct your own list here, it will override the example above
 # !DO NOT! remove this if you don't need to replace anything, leave it empty as it is now
 REPLACE="
-/system/vendor/overlay
 "
 
 ##########################################################################################

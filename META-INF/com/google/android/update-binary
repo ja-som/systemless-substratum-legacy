@@ -61,6 +61,9 @@ api_level_arch_detect
 
 # You can get the Android API version from $API, the CPU architecture from $ARCH
 # Useful if you are creating Android version / platform dependent mods
+if [ $API -gt 25 ]; then
+  abort "! This module isn't for Oreo and above!"
+fi
 
 # Setup busybox and binaries
 $BOOTMODE && boot_actions || recovery_actions
@@ -122,7 +125,7 @@ elif ! $AUTOUNINSTALL; then
 fi
 
 if $INSTALL; then
-  # Create mod paths
+  # Create module paths
   rm -rf $MODPATH 2>/dev/null
   mkdir -p $MODPATH
 
@@ -131,7 +134,7 @@ if $INSTALL; then
   unzip -o "$ZIP" 'system/*' -d $MODPATH >&2
 
   # Remove placeholder
-  rm -f $MODPATH/system/placeholder 2>/dev/null
+  rm -f $MODPATH/system/vendor/overlay/placeholder 2>/dev/null
 
   # Handle replace folders
   for TARGET in $REPLACE; do
@@ -166,6 +169,8 @@ elif ! $INSTALL; then
   ui_print "- Uninstalling the module"
 
   if ! $BOOTMODE; then
+    rm -rf /data/resource-cache 2>/dev/null
+    rm -rf /data/system/theme 2>/dev/null
     rm -rf $MODPATH2 2>/dev/null
   elif $BOOTMODE; then
     touch $MODPATH2/remove 2>/dev/null
